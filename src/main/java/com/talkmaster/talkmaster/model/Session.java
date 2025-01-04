@@ -15,6 +15,7 @@ public class Session {
     private LocalDateTime endTime;
     private String status; 
     private String topic;
+    private String instructorTimeSlotId;
 
     // Getters and Setters
 
@@ -72,5 +73,13 @@ public class Session {
 
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public String getInstructorTimeSlotId() {
+        return instructorTimeSlotId;
+    }
+
+    public void setInstructorTimeSlotId(String instructorTimeSlotId) {
+        this.instructorTimeSlotId = instructorTimeSlotId;
     }
 }

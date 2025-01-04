@@ -1,5 +1,6 @@
 package com.talkmaster.talkmaster.service;
 
+import com.talkmaster.talkmaster.model.InstructorTimeSlot;
 import com.talkmaster.talkmaster.model.Session;
 import com.talkmaster.talkmaster.repository.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,18 @@ public class SessionService {
     @Autowired
     private SessionRepository sessionRepository;
 
+    @Autowired
+    private InstructorTimeSlotService instructorTimeSlotService;
+
     // Create a new session
     public Session createSession(Session session) {
-        return sessionRepository.save(session);
+        Session createdSession = sessionRepository.save(session);
+        InstructorTimeSlot instructorTimeSlot = new InstructorTimeSlot();
+        instructorTimeSlot.setStatus("scheduled");
+        instructorTimeSlot.setScheduleId(createdSession.getId());
+        instructorTimeSlotService.updateInstructorTimeSlot(createdSession.getInstructorTimeSlotId(), instructorTimeSlot);
+        return createdSession;
+
     }
 
     // Get all sessions
