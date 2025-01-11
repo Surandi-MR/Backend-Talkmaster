@@ -1,6 +1,6 @@
 package com.talkmaster.talkmaster.controller;
 
-import com.talkmaster.talkmaster.model.User;
+import com.talkmaster.talkmaster.model.Users;
 import com.talkmaster.talkmaster.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,29 +14,39 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/all")
-    public List<User> getUsers() {
+    public List<Users> getUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable String id) {
+    public Users getUserById(@PathVariable String id) {
         return userService.getUserById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
 
     @GetMapping("/email/{email}")
-    public User getUserByEmail(@PathVariable String email) {
+    public Users getUserByEmail(@PathVariable String email) {
         return userService.getUserByEmail(email);
     }
 
+    @GetMapping("/role/{role}")
+    public List<Users> getUsersByRole(@PathVariable String role) {
+        return userService.getUsersByRole(role);
+    }
+
     @PostMapping("/create")
-    public User createUser(@RequestBody User user) {
+    public Users createUser(@RequestBody Users user) {
         return userService.createUser(user);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable String id, @RequestBody User userDetails) {
+    public Users updateUser(@PathVariable String id, @RequestBody Users userDetails) {
         return userService.updateUserById(id, userDetails);
+    }
+
+    @PutMapping("/update-passwor")
+    public String updatePassword(@RequestBody Users user){
+        return userService.updatePassword(user);
     }
 
     @DeleteMapping("/{id}")
