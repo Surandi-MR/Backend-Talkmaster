@@ -4,16 +4,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
-public class User {
+public class Users {
     @Id
     private String id; 
     private String firstName;
     private String lastName;
     private String email;
-    private int phone_no;
+    private String phone_no;
     private String gender;
-    private String proficiency;
-    private String username;
     private String password;
     private String role;
 
@@ -42,9 +40,9 @@ public class User {
         this.email = email;
     }
 
-    public int getPhone_no() { return phone_no; }
+    public String getPhone_no() { return phone_no; }
 
-    public void setPhone_no(int phone_no) { this.phone_no = phone_no; }
+    public void setPhone_no(String phone_no) { this.phone_no = phone_no; }
 
     public String getGender() { return gender; }
 
@@ -57,14 +55,6 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
-
-    public String getProficiency() { return proficiency; }
-
-    public void setProficiency(String proficiency) { this.proficiency = proficiency; }
-
-    public String getUsername() { return username; }
-
-    public void setUsername(String username) { this.username = username; }
 
     public String getPassword() { return password; }
 

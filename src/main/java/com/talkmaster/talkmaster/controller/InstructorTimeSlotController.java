@@ -1,7 +1,7 @@
 package com.talkmaster.talkmaster.controller;
 
 import com.talkmaster.talkmaster.model.InstructorTimeSlot;
-import com.talkmaster.talkmaster.model.User;
+import com.talkmaster.talkmaster.model.Users;
 import com.talkmaster.talkmaster.service.InstructorTimeSlotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,7 @@ public class InstructorTimeSlotController {
 
     // Get all available instructors for a specific date and time slot
     @GetMapping("/available-instructors/date/{date}/time-slot/{timeSlot}")
-    public List<User> getAvailableInstructors(@PathVariable String date, @PathVariable String timeSlot) {
+    public List<Users> getAvailableInstructors(@PathVariable String date, @PathVariable String timeSlot) {
         LocalDate localDate = LocalDate.parse(date);
         return instructorTimeSlotService.getAvailableInstructors(localDate, timeSlot);
     }

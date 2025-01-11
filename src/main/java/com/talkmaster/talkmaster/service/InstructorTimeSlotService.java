@@ -1,7 +1,7 @@
 package com.talkmaster.talkmaster.service;
 
 import com.talkmaster.talkmaster.model.InstructorTimeSlot;
-import com.talkmaster.talkmaster.model.User;
+import com.talkmaster.talkmaster.model.Users;
 import com.talkmaster.talkmaster.repository.InstructorTimeSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,9 +29,9 @@ public class InstructorTimeSlotService {
     }
 
     // Get all available instructors for a specific date and time slot
-    public List<User> getAvailableInstructors(LocalDate date, String timeSlot) {
+    public List<Users> getAvailableInstructors(LocalDate date, String timeSlot) {
         List<InstructorTimeSlot> avaInstructorTimeSlots = instructorTimeSlotRepository.findByDateAndTimeSlotAndStatus(date, timeSlot, "available");
-        List<User> availableInstructors = avaInstructorTimeSlots.stream()
+        List<Users> availableInstructors = avaInstructorTimeSlots.stream()
                 .map(instructorTimeSlot -> instructorService.getUserById(instructorTimeSlot.getInstructorId()).get())
                 .toList();
         return availableInstructors;
