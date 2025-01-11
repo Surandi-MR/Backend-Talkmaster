@@ -1,27 +1,44 @@
 package com.talkmaster.talkmaster.service;
 
-import com.talkmaster.talkmaster.model.User;
+import com.talkmaster.talkmaster.model.Users;
 import com.talkmaster.talkmaster.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.talkmaster.talkmaster.model.UserPrincipal;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<User> getAllUsers() {
+    private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10);
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Users user = userRepository.findByEmail(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+
+        return new UserPrincipal(user); 
+    }
+
+    public List<Users> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(String id) {
+    public Optional<Users> getUserById(String id) {
         return userRepository.findById(id);
     }
 
-    public User getUserByEmail(String email) {
+    public Users getUserByEmail(String email) {
         return userRepository.findAll().stream()
                 .filter(user -> email.equals(user.getEmail()))
                 .findFirst()
@@ -32,26 +49,52 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User updateUserById(String id, User userDetails) {
+    public Users updateUserById(String id, Users userDetails) {
         return userRepository.findById(id).map(user -> {
-            user.setFirstName(userDetails.getFirstName());
-            user.setLastName(userDetails.getLastName());
-            user.setEmail(userDetails.getEmail());
-            user.setPhone_no(userDetails.getPhone_no());
-            user.setGender(userDetails.getGender());
-            user.setProficiency(userDetails.getProficiency());
-            user.setUsername(userDetails.getUsername());
-            user.setPassword(userDetails.getPassword());
-            user.setRole(userDetails.getRole());
+            if (userDetails.getFirstName() != null) {
+                user.setFirstName(userDetails.getFirstName());
+            }
+            if (userDetails.getLastName() != null) {
+                user.setLastName(userDetails.getLastName());
+            }
+            if (userDetails.getEmail() != null) {
+                user.setEmail(userDetails.getEmail());
+            }
+            if (userDetails.getPhone_no() != null) {
+                user.setPhone_no(userDetails.getPhone_no());
+            }
+            if (userDetails.getGender() != null) {
+                user.setGender(userDetails.getGender());
+            }
+            if (userDetails.getPassword() != null) {
+                user.setPassword(userDetails.getPassword());
+            }
+            if (userDetails.getRole() != null) {
+                user.setRole(userDetails.getRole());
+            }
             return userRepository.save(user);
         }).orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public Users createUser(Users user) {
+        Users existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser != null) {
+            throw new RuntimeException("User with email " + user.getEmail() + " already exists");
+        }
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        Users savedUser = userRepository.save(user);
+        savedUser.setPassword(null);
+        return savedUser;
     }
 
-    public List<User> getUsersByRole(String role) {
+    public String updatePassword(Users user){
+         Users existingUser = userRepository.findByEmail(user.getEmail());
+         existingUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+         userRepository.save(existingUser);
+         return "password updated";
+    }
+
+    public List<Users> getUsersByRole(String role) {
         return userRepository.findByRole(role);
     }
 }
