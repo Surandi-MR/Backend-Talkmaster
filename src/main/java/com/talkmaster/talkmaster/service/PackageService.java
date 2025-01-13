@@ -31,11 +31,18 @@ public class PackageService {
     // Update an existing package
     public PackageModel updatePackage(String id, PackageModel packageDetails) {
         return packageRepository.findById(id).map(existingPackage -> {
-            existingPackage.setName(packageDetails.getName());
-            existingPackage.setPrice(packageDetails.getPrice());
-            existingPackage.setSessions(packageDetails.getSessions());
-            existingPackage.setDuration(packageDetails.getDuration());
-            existingPackage.setDescription(packageDetails.getDescription());
+            if (packageDetails.getName() != null){
+                existingPackage.setName(packageDetails.getName());
+            }
+            if(packageDetails.getPrice() != 0.0){
+                existingPackage.setPrice(packageDetails.getPrice());
+            }
+            if(packageDetails.getSessions() != 0.0){
+                existingPackage.setSessions(packageDetails.getSessions());       
+            }
+            if(packageDetails.getDescription() != null){
+                existingPackage.setDescription(packageDetails.getDescription());
+            }
             return packageRepository.save(existingPackage);
         }).orElseThrow(() -> new RuntimeException("Package not found with id " + id));
     }

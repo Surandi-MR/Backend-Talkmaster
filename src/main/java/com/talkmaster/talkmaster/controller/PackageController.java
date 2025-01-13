@@ -27,7 +27,7 @@ public class PackageController {
     }
 
     // Create a new package
-    @PostMapping("/create")
+    @PostMapping
     public PackageModel createPackage(@RequestBody PackageModel pkg) {
         return packageService.createPackage(pkg);
     }

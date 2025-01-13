@@ -28,4 +28,7 @@ public interface UserPackageRepository extends MongoRepository<UserPackage, Stri
      * Finds all UserPackage entities by the given userId and where remainingSessions is greater than the specified value.
      */
     List<UserPackage> findByUserIdAndRemainingSessionsGreaterThan(String userId, int remainingSessions);
+
+    // Find first user package by user id and remaining sessions greater than the specified value
+    UserPackage findFirstByUserIdAndRemainingSessionsGreaterThan(String userId, int remainingSessions);
 }
