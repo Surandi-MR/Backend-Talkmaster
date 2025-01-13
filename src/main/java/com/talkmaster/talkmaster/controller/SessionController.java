@@ -5,8 +5,8 @@ import com.talkmaster.talkmaster.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/sessions")
@@ -15,51 +15,29 @@ public class SessionController {
     @Autowired
     private SessionService sessionService;
 
-    
     // Create a new session
     @PostMapping
     public Session createSession(@RequestBody Session session) {
         return sessionService.createSession(session);
     }
 
-    // Get all sessions
-    @GetMapping("/all")
-    public List<Session> getAllSessions() {
-        return sessionService.getAllSessions();
-    }
-
     // Get session by ID
     @GetMapping("/{id}")
-    public Optional<Session> getSessionById(@PathVariable String id) {
+    public Session getSessionById(@PathVariable String id) {
         return sessionService.getSessionById(id);
     }
 
-    // Get sessions by status and student and instructor
+    // Get sessions within a date range
     @GetMapping
     public List<Session> getSessions(
+            @RequestParam(value = "studentId", required = false) String studentId, 
+            @RequestParam(value = "instructorId", required = false) String instructorId, 
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "studentId", required = false) String studentId,
-            @RequestParam(value = "instructorId", required = false) String instructorId) {
-        return sessionService.getSessions(studentId, instructorId, status);
+            @RequestParam(value = "startTime", required = false) LocalDateTime startTime,
+            @RequestParam(value = "endTime", required = false) LocalDateTime endTime) {
+        return sessionService.getSessions(studentId, instructorId, status, startTime, endTime);
     }
-
-    // Get sessions within a date range
-    @GetMapping("/date-range")
-    public List<Session> getSessionsByDateRange(
-            @RequestParam("startDate") String startDate, 
-            @RequestParam("endDate") String endDate, 
-            @RequestParam("studentId") String studentId,
-            @RequestParam("instructorId") String instructorId) {
-        return sessionService.getSessionsByDateRangeAndUser(startDate, endDate, studentId, instructorId);
-    }
-
-    // Get upcoming sessions for next 7 days
-    @GetMapping("/upcoming")
-    public List<Session> getUpcomingSessions(
-        @RequestParam(value = "studentId", required = false) String studentId,
-        @RequestParam(value = "instructorId", required = false) String instructorId) {
-        return sessionService.getSessionsByDateRangeAndUser(null, null, studentId, instructorId);
-    }
+    
 
     // Update a session
     @PutMapping("/{id}")
@@ -67,6 +45,14 @@ public class SessionController {
             @PathVariable String id, 
             @RequestBody Session sessionDetails) {
         return sessionService.updateSession(id, sessionDetails);
+    }
+
+    // Schedule a session
+    @PutMapping("/schedule/{id}")
+    public Session bookSession(
+        @PathVariable String id,
+        @RequestBody Session sessionDetails) {
+        return sessionService.scheduleSession(id, sessionDetails);
     }
 
     // Delete a session by ID

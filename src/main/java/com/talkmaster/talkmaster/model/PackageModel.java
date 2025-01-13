@@ -9,8 +9,7 @@ public class PackageModel {
     private String id; // MongoDB document ID
     private String name;
     private double price;
-    private int sessions; // Number of session hours included in the package
-    private int duration; // Validity of the package in days
+    private int sessions; // Number of sessions included in the package
     private String description;
 
     // Getters and setters
@@ -44,14 +43,6 @@ public class PackageModel {
 
     public void setSessions(int sessions) {
         this.sessions = sessions;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
     }
 
     public String getDescription() {

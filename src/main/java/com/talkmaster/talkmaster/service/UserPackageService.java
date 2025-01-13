@@ -20,6 +20,7 @@ public class UserPackageService {
 
     // Assign a package to a user
     public UserPackage assignPackageToUser(String userId, String packageId) {
+        System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " + packageId);
         PackageModel pkg = packageService.getPackageById(packageId)
                 .orElseThrow(() -> new RuntimeException("UserPackage not found"));
         

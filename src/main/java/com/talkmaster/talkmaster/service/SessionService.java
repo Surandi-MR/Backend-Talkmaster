@@ -1,14 +1,15 @@
 package com.talkmaster.talkmaster.service;
 
-import com.talkmaster.talkmaster.model.InstructorTimeSlot;
 import com.talkmaster.talkmaster.model.Session;
+import com.talkmaster.talkmaster.model.UserPackage;
 import com.talkmaster.talkmaster.repository.SessionRepository;
+import com.talkmaster.talkmaster.repository.UserPackageRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SessionService {
@@ -17,34 +18,34 @@ public class SessionService {
     private SessionRepository sessionRepository;
 
     @Autowired
-    private InstructorTimeSlotService instructorTimeSlotService;
+    private UserPackageRepository userPackageRepository;
 
-    // Create a new session
+    // Instructor Create a new session and make it available for students to book
     public Session createSession(Session session) {
         Session createdSession = sessionRepository.save(session);
-        InstructorTimeSlot instructorTimeSlot = new InstructorTimeSlot();
-        instructorTimeSlot.setStatus("scheduled");
-        instructorTimeSlot.setScheduleId(createdSession.getId());
-        instructorTimeSlotService.updateInstructorTimeSlot(createdSession.getInstructorTimeSlotId(), instructorTimeSlot);
         return createdSession;
-
-    }
-
-    // Get all sessions
-    public List<Session> getAllSessions() {
-        return sessionRepository.findAll();
     }
 
     // Get session by ID
-    public Optional<Session> getSessionById(String sessionId) {
-        return sessionRepository.findById(sessionId);
+    public Session getSessionById(String sessionId) {
+        return sessionRepository.findById(sessionId).orElseThrow(() -> new RuntimeException("Session not found with id " + sessionId));    
     }
 
-    // Get sessions by studentId, instructorId, and status
-    public List<Session> getSessions(String studentId, String instructorId, String status) {
-        if (studentId != null && instructorId != null && status != null) {
-            return sessionRepository.findByStatusAndStudentIdAndInstructorId(status, studentId, instructorId);
-        } else if (studentId != null && instructorId != null) {
+
+    public List<Session> getSessions(String studentId, String instructorId, String status, LocalDateTime startTime, LocalDateTime endTime) {
+        if (studentId != null && instructorId != null && status != null && startTime != null && endTime != null) {
+            return sessionRepository.findByStudentIdAndInstructorIdAndStatusAndTimeBetween(studentId, instructorId, status, startTime, endTime);
+        } else if(studentId != null && status != null && startTime != null && endTime != null){
+            return sessionRepository.findByStudentIdAndStatusAndTimeBetween(studentId, status, startTime, endTime);
+        }else if(instructorId != null && status != null && startTime != null && endTime != null){
+            return sessionRepository.findByInstructorIdAndStatusAndTimeBetween(instructorId, status, startTime, endTime);
+        } else if( studentId != null && startTime != null && endTime != null){
+            return sessionRepository.findByStudentIdAndTimeBetween(studentId, startTime, endTime);
+        } else if( instructorId != null && startTime != null && endTime != null){
+            return sessionRepository.findByInstructorIdAndTimeBetween(instructorId, startTime, endTime);
+        }else if(studentId != null && instructorId != null && status!= null){
+            return sessionRepository.findByStudentIdAndInstructorIdAndStatus(studentId, instructorId, status);
+        }else if (studentId != null && instructorId != null) {
             return sessionRepository.findByStudentIdAndInstructorId(studentId, instructorId);
         } else if (studentId != null && status != null) {
             return sessionRepository.findByStudentIdAndStatus(studentId, status);
@@ -54,33 +55,12 @@ public class SessionService {
             return sessionRepository.findByStudentId(studentId);
         } else if (instructorId != null) {
             return sessionRepository.findByInstructorId(instructorId);
-        } else {
+        } else if (status != null && startTime != null){
+            return sessionRepository.findByStatusAndTime(status, startTime);
+        }else {
             return List.of();
         }
-    }
-
-    // Get sessions within a date range for a specific student or instructor
-    public List<Session> getSessionsByDateRangeAndUser(String startDate, String endDate, String studentId,  String instructorId) {
-        LocalDateTime startDateTime;
-        LocalDateTime endDateTime;
-
-        if (startDate == null || startDate.isEmpty()) {
-            startDateTime = LocalDateTime.now();
-        } else {
-            startDateTime = LocalDateTime.parse(startDate);
-        }
-
-        if (endDate == null || endDate.isEmpty()) {
-            endDateTime = LocalDateTime.now().plusDays(7);
-        } else {
-            endDateTime = LocalDateTime.parse(endDate);
-        }
-
-        if (studentId != null) {
-            return sessionRepository.findByStudentIdAndStartTimeBetween(studentId, startDateTime, endDateTime);
-        } else {
-            return sessionRepository.findByInstructorIdAndStartTimeBetween(instructorId, startDateTime, endDateTime);
-        }
+        
     }
 
     // Update a session
@@ -89,23 +69,32 @@ public class SessionService {
             if(sessionDetails.getTopic() != null) {
                 session.setTopic(sessionDetails.getTopic());
             }
-            if(sessionDetails.getStartTime() != null) {
-                session.setStartTime(sessionDetails.getStartTime());
-            }
-            if(sessionDetails.getEndTime() != null) {
-                session.setEndTime(sessionDetails.getEndTime());
+            if(sessionDetails.getStudentId() != null) {
+                session.setStudentId(sessionDetails.getStudentId());
             }
             if(sessionDetails.getInstructorId() != null) {
                 session.setInstructorId(sessionDetails.getInstructorId());
             }
-            if(sessionDetails.getStudentId() != null) {
-                session.setStudentId(sessionDetails.getStudentId());
+            if(sessionDetails.getTime() != null) {
+                session.setTime(sessionDetails.getTime());
             }
             if(sessionDetails.getStatus() != null) {
                 session.setStatus(sessionDetails.getStatus());
             }
+            if(sessionDetails.getMeetingLink() != null) {
+                session.setMeetingLink(sessionDetails.getMeetingLink());
+            }
             return sessionRepository.save(session);
         }).orElseThrow(() -> new RuntimeException("Session not found with id: " + sessionId));
+    }
+
+    // Student Schedule a session
+    public Session scheduleSession(String sessionId, Session sessionDetails) {
+        UserPackage activePackage = userPackageRepository.findByUserIdAndRemainingSessionsGreaterThan(sessionDetails.getStudentId(), 0)
+                .stream().findFirst().orElseThrow(() -> new RuntimeException("No active package found for user"));
+        activePackage.setRemainingSessions(activePackage.getRemainingSessions() - 1);
+        userPackageRepository.save(activePackage);
+        return this.updateSession(sessionId, sessionDetails);
     }
 
     // Delete a session by ID

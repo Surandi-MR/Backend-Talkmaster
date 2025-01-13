@@ -11,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.talkmaster.talkmaster.model.UserPrincipal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -34,8 +33,8 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public Optional<Users> getUserById(String id) {
-        return userRepository.findById(id);
+    public Users getUserById(String id) {
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
 
     public Users getUserByEmail(String email) {

@@ -1,21 +1,21 @@
 package com.talkmaster.talkmaster.model;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.time.LocalDateTime;
 
 @Document(collection = "sessions")
 public class Session {
 
     @Id
     private String id;
-    private String studentId;  
-    private String instructorId; 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private String status; 
+    private String studentId;
+    private String instructorId;
+    private LocalDateTime time;
+    private String status;
     private String topic;
-    private String instructorTimeSlotId;
+    private String meetingLink;
 
     // Getters and Setters
 
@@ -43,20 +43,12 @@ public class Session {
         this.instructorId = instructorId;
     }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
+    public LocalDateTime getTime() {
+        return time;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
+    public void setTime(LocalDateTime time) {
+        this.time = time;
     }
 
     public String getStatus() {
@@ -75,11 +67,11 @@ public class Session {
         this.topic = topic;
     }
 
-    public String getInstructorTimeSlotId() {
-        return instructorTimeSlotId;
+    public String getMeetingLink() {
+        return meetingLink;
     }
 
-    public void setInstructorTimeSlotId(String instructorTimeSlotId) {
-        this.instructorTimeSlotId = instructorTimeSlotId;
+    public void setMeetingLink(String meetingLink) {
+        this.meetingLink = meetingLink;
     }
 }
