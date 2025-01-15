@@ -90,12 +90,15 @@ public class SessionService {
 
     // Student Schedule a session
     public Session scheduleSession(String sessionId, Session sessionDetails) {
-        UserPackage activePackage = userPackageRepository.findByUserIdAndRemainingSessionsGreaterThan(sessionDetails.getStudentId(), 0)
-                .stream().findFirst().orElseThrow(() -> new RuntimeException("No active package found for user"));
-        activePackage.setRemainingSessions(activePackage.getRemainingSessions() - 1);
-        userPackageRepository.save(activePackage);
-        return this.updateSession(sessionId, sessionDetails);
-    }
+    UserPackage activePackage = userPackageRepository.findByUserIdAndRemainingSessionsGreaterThan(sessionDetails.getStudentId(), 0)
+            .stream().findFirst().orElseThrow(() -> new RuntimeException("No active package found for user"));
+
+    activePackage.setRemainingSessions(activePackage.getRemainingSessions() - 1);
+    userPackageRepository.save(activePackage);
+
+    return this.updateSession(sessionId, sessionDetails);
+}
+
 
     // Delete a session by ID
     public void deleteSession(String sessionId) {
