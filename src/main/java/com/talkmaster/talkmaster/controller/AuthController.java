@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.talkmaster.talkmaster.enums.UserRole;
 import com.talkmaster.talkmaster.model.Users;
 import com.talkmaster.talkmaster.service.AuthService;
 import com.talkmaster.talkmaster.service.UserService;
@@ -30,7 +31,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public Users register(@RequestBody Users user){
-        user.setRole("student");
+        user.setRole(UserRole.STUDENT);
         try {
             return userService.createUser(user);
         } catch (Exception e) {

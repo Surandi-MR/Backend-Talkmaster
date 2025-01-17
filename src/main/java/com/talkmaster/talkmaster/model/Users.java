@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.talkmaster.talkmaster.enums.UserRole;
+
 @Document(collection = "users")
 public class Users {
     @Id
@@ -15,7 +17,7 @@ public class Users {
     private String phone_no;
     private String gender;
     private String password;
-    private String role;
+    private UserRole role;
     private LocalDateTime created_at;
 
     // Getters and setters
@@ -51,11 +53,11 @@ public class Users {
 
     public void setGender(String gender) { this.gender = gender; }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
