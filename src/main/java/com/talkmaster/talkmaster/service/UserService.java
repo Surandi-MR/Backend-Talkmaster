@@ -37,13 +37,6 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
 
-    public Users getUserByEmail(String email) {
-        return userRepository.findAll().stream()
-                .filter(user -> email.equals(user.getEmail()))
-                .findFirst()
-                .orElse(null);
-    }
-
     public void deleteUserById(String id) {
         userRepository.deleteById(id);
     }
@@ -81,6 +74,7 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("User with email " + user.getEmail() + " already exists");
         }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setCreatedAt(java.time.LocalDateTime.now());
         Users savedUser = userRepository.save(user);
         savedUser.setPassword(null);
         return savedUser;

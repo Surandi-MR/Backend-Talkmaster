@@ -6,6 +6,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import com.talkmaster.talkmaster.model.Users;
+import com.talkmaster.talkmaster.repository.UserRepository;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 
 @Service
 public class AuthService {
@@ -16,12 +20,21 @@ public class AuthService {
     @Autowired
     private JWTService jwtService;
 
-    public String verify(Users user){
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+    @Autowired
+    private UserRepository userRepository;
 
-        if (authentication.isAuthenticated()){
-            return jwtService.generateToken(user.getEmail());
+    public Map<String, Object> verify(Users credentials) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(credentials.getEmail(), credentials.getPassword()));
+
+        if (authentication.isAuthenticated()) {
+            Users user = userRepository.findByEmail(credentials.getEmail());
+            String token = jwtService.generateToken(credentials.getEmail());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("user", user);
+            response.put("token", token);
+            return response;
         }
-        return "fail";
+        return Collections.singletonMap("status", "fail");
     }
 }

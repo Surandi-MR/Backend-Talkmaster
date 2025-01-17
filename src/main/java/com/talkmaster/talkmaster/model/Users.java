@@ -1,5 +1,7 @@
 package com.talkmaster.talkmaster.model;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +16,7 @@ public class Users {
     private String gender;
     private String password;
     private String role;
+    private LocalDateTime created_at;
 
     // Getters and setters
     public String getId() {
@@ -59,5 +62,13 @@ public class Users {
     public String getPassword() { return password; }
 
     public void setPassword(String password) { this.password = password;}
+
+    public LocalDateTime getCreatedAt(){
+        return created_at;
+    }
+
+    public void setCreatedAt(LocalDateTime created_at){
+        this.created_at = created_at;
+    }
 
 }

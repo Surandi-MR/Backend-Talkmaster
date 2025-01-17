@@ -23,11 +23,6 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @GetMapping("/email/{email}")
-    public Users getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email);
-    }
-
     @GetMapping("/role/{role}")
     public List<Users> getUsersByRole(@PathVariable String role) {
         return userService.getUsersByRole(role);

@@ -1,5 +1,7 @@
 package com.talkmaster.talkmaster.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,8 +21,9 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public String login(@RequestBody Users user){
+    public Map<String, Object>  login(@RequestBody Users user){
 
+        System.out.println(user.getEmail());
         return authService.verify(user);
 
     }
