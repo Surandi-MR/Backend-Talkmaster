@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import com.talkmaster.talkmaster.model.UserPrincipal;
 import java.util.List;
@@ -16,6 +17,9 @@ import java.util.List;
 public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10);
 
@@ -69,16 +73,28 @@ public class UserService implements UserDetailsService {
     }
 
     public Users createUser(Users user) {
-        Users existingUser = userRepository.findByEmail(user.getEmail());
-        if (existingUser != null) {
-            throw new RuntimeException("User with email " + user.getEmail() + " already exists");
-        }
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setCreatedAt(java.time.LocalDateTime.now());
-        Users savedUser = userRepository.save(user);
-        savedUser.setPassword(null);
-        return savedUser;
+    Users existingUser = userRepository.findByEmail(user.getEmail());
+    if (existingUser != null) {
+        throw new RuntimeException("User with email " + user.getEmail() + " already exists");
     }
+
+    // Generate a random password if none is provided
+    if (user.getPassword() == null || user.getPassword().isEmpty()) {
+        String generatedPassword = RandomStringUtils.random(8, true, true); // Generate 8-character random password
+        user.setPassword(generatedPassword);
+
+        emailService.sendPasswordEmail(user.getEmail(), generatedPassword);
+    }
+
+    user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    user.setCreatedAt(java.time.LocalDateTime.now());
+
+    Users savedUser = userRepository.save(user);
+
+    // Remove password before returning the response
+    savedUser.setPassword(null);
+    return savedUser;
+}
 
     public String updatePassword(Users user){
          Users existingUser = userRepository.findByEmail(user.getEmail());
