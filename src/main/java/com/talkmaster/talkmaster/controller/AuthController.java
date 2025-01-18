@@ -23,10 +23,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public Map<String, Object>  login(@RequestBody Users user){
-
-        System.out.println(user.getEmail());
         return authService.verify(user);
-
     }
 
     @PostMapping("/register")
@@ -35,10 +32,7 @@ public class AuthController {
         try {
             return userService.createUser(user);
         } catch (Exception e) {
-            if (e.getMessage().contains("already exists")) {
-                throw new IllegalArgumentException("User with this email already exists");
-            }
-            throw new RuntimeException("An error occurred during registration");
+            throw e;
         }
     }
 

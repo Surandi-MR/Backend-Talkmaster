@@ -1,5 +1,6 @@
 package com.talkmaster.talkmaster.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
@@ -15,7 +16,7 @@ public class Users {
     private String lastName;
     private String email;
     private String phone_no;
-    private String gender;
+    private LocalDate birthday;
     private String password;
     private UserRole role;
     private LocalDateTime created_at;
@@ -49,9 +50,9 @@ public class Users {
 
     public void setPhone_no(String phone_no) { this.phone_no = phone_no; }
 
-    public String getGender() { return gender; }
+    public LocalDate getBirthday() { return birthday; }
 
-    public void setGender(String gender) { this.gender = gender; }
+    public void setBirthday(LocalDate birthday) { this.birthday = birthday; }
 
     public UserRole getRole() {
         return role;
