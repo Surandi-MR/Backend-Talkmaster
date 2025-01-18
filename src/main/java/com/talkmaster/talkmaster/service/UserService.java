@@ -55,8 +55,8 @@ public class UserService implements UserDetailsService {
             if (userDetails.getPhone_no() != null) {
                 user.setPhone_no(userDetails.getPhone_no());
             }
-            if (userDetails.getGender() != null) {
-                user.setGender(userDetails.getGender());
+            if (userDetails.getBirthday() != null) {
+                user.setBirthday(userDetails.getBirthday());
             }
             if (userDetails.getPassword() != null) {
                 user.setPassword(userDetails.getPassword());
