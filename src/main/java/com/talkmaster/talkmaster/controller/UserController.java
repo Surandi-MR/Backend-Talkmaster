@@ -4,6 +4,7 @@ import com.talkmaster.talkmaster.model.Users;
 import com.talkmaster.talkmaster.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.talkmaster.talkmaster.dto.PasswordUpdateRequest;
 
 import java.util.List;
 
@@ -38,9 +39,9 @@ public class UserController {
         return userService.updateUserById(id, userDetails);
     }
 
-    @PutMapping("/update-passwor")
-    public String updatePassword(@RequestBody Users user){
-        return userService.updatePassword(user);
+    @PutMapping("/update-password/{id}")
+    public String updatePassword(@PathVariable String id, @RequestBody PasswordUpdateRequest passwordUpdateRequest) {
+        return userService.updatePassword(id, passwordUpdateRequest);
     }
 
     @DeleteMapping("/{id}")
