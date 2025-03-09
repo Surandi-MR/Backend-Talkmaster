@@ -48,4 +48,7 @@ public interface SessionRepository extends MongoRepository<Session, String> {
     // Find all sessions by studentId, instructorId, status, and time range
     List<Session> findByStudentIdAndInstructorIdAndStatusAndTimeBetween(String studentId, String instructorId, String status, LocalDateTime startTime, LocalDateTime endTime);
 
+    // find all sessions by studentId or instructorId
+    List<Session> findByStudentIdOrInstructorId(String studentId, String instructorId);
+
 }

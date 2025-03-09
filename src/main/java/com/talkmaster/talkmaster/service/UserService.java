@@ -1,6 +1,9 @@
 package com.talkmaster.talkmaster.service;
 
 import com.talkmaster.talkmaster.model.Users;
+import com.talkmaster.talkmaster.repository.PackageRepository;
+import com.talkmaster.talkmaster.repository.SessionRepository;
+import com.talkmaster.talkmaster.repository.UserPackageRepository;
 import com.talkmaster.talkmaster.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,8 +12,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.apache.commons.lang3.RandomStringUtils;
-import com.talkmaster.talkmaster.dto.PasswordUpdateRequest;
 
+import com.talkmaster.talkmaster.dto.GetUserWithDetails;
+import com.talkmaster.talkmaster.dto.PasswordUpdateRequest;
+import com.talkmaster.talkmaster.model.PackageModel;
+import com.talkmaster.talkmaster.model.Session;
+import com.talkmaster.talkmaster.model.UserPackage;
 import com.talkmaster.talkmaster.model.UserPrincipal;
 import java.util.List;
 
@@ -21,6 +28,15 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private EmailService emailService;
+
+     @Autowired
+    private UserPackageRepository userPackageRepository;
+
+     @Autowired
+    private SessionRepository sessionRepository;
+
+    @Autowired
+    private PackageRepository packageRepository;
 
     private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10);
 
@@ -38,9 +54,58 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public Users getUserById(String id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id " + id));
-    }
+    public GetUserWithDetails getUserById(String id) {
+    GetUserWithDetails userWithDetails = new GetUserWithDetails();
+    
+    // Get the user
+    Users user = userRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+    userWithDetails.setUser(user);
+    
+    // Get sessions where the user is either a student or instructor
+    List<Session> userSessions = sessionRepository.findByStudentIdOrInstructorId(id, id);
+    
+    // Convert List to Array and ensure student and instructor are populated
+    Session[] sessions = userSessions.stream()
+        .map(session -> {
+            // Ensure student is populated
+            if (session.getStudentId() != null && session.getStuddent() == null) {
+                Users student = userRepository.findById(session.getStudentId())
+                    .orElseThrow(() -> new RuntimeException("Student not found with id " + session.getStudentId()));
+                session.setStuddent(student);
+            }
+            
+            // Ensure instructor is populated
+            if (session.getInstructorId() != null && session.getInstructor() == null) {
+                Users instructor = userRepository.findById(session.getInstructorId())
+                    .orElseThrow(() -> new RuntimeException("Instructor not found with id " + session.getInstructorId()));
+                session.setInstructor(instructor);
+            }
+            
+            return session;
+        })
+        .toArray(Session[]::new);
+    userWithDetails.setSessions(sessions);
+    
+    // Get user packages
+    List<UserPackage> userPackages = userPackageRepository.findByUserId(id);
+    
+    // Convert List to Array and ensure package details are populated
+    UserPackage[] packages = userPackages.stream()
+        .map(userPackage -> {
+            // Ensure package details are populated
+            if (userPackage.getPackageId() != null && userPackage.getPackageModel() == null) {
+                PackageModel packageModel = packageRepository.findById(userPackage.getPackageId())
+                    .orElseThrow(() -> new RuntimeException("Package not found with id " + userPackage.getPackageId()));
+                userPackage.setPackageModel(packageModel);
+            }
+            return userPackage;
+        })
+        .toArray(UserPackage[]::new);
+    userWithDetails.setPackages(packages);
+    
+    return userWithDetails;
+}
 
     public void deleteUserById(String id) {
         userRepository.deleteById(id);
