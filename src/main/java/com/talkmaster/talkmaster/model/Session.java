@@ -16,6 +16,8 @@ public class Session {
     private String status;
     private String topic;
     private String meetingLink;
+    private Users studdent;
+    private Users instructor;
 
     // Getters and Setters
 
@@ -73,5 +75,21 @@ public class Session {
 
     public void setMeetingLink(String meetingLink) {
         this.meetingLink = meetingLink;
+    }
+
+    public Users getStuddent() {
+        return studdent;
+    }
+
+    public void setStuddent(Users studdent) {
+        this.studdent = studdent;
+    }
+
+    public Users getInstructor() {
+        return instructor;
+    }
+
+    public void setInstructor(Users instructor) {
+        this.instructor = instructor;
     }
 }

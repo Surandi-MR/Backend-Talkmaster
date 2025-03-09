@@ -4,6 +4,8 @@ import com.talkmaster.talkmaster.model.Users;
 import com.talkmaster.talkmaster.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import com.talkmaster.talkmaster.dto.GetUserWithDetails;
 import com.talkmaster.talkmaster.dto.PasswordUpdateRequest;
 
 import java.util.List;
@@ -20,7 +22,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Users getUserById(@PathVariable String id) {
+    public GetUserWithDetails getUserById(@PathVariable String id) {
         return userService.getUserById(id);
     }
 
